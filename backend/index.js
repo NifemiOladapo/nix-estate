@@ -1,7 +1,17 @@
+import dotenv from "dotenv";
 import express from "express";
+import mongoose from "mongoose";
+import authRouter from "./routes/auth.route.js";
+dotenv.config();
+
+mongoose
+  .connect(process.env.MONGO__URI)
+  .then(() => console.log("Connected To Db"))
+  .catch((err) => console.log(err));
 
 const app = express();
+app.use(express.json());
 
-app.get("/", (req, res) => res.json("this works"));
+app.use("/api/auth", authRouter);
 
 app.listen(3000, () => console.log("Server Is Running Successfully!!!"));
