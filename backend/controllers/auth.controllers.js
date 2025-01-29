@@ -32,7 +32,6 @@ export const signin = async (req, res, next) => {
       .cookie("access__token", token, { httpOnly: true })
       .status(200)
       .json(rest);
-    console.log("hi");
   } catch (error) {
     next(error);
   }

@@ -1,6 +1,10 @@
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { signInSuccess } from "../redux/user/userSlice.js";
 
 const Header = () => {
+  const { currentUser } = useSelector((state) => (state as any).user);
+  const dispatch = useDispatch();
   return (
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl p-3 w-full mx-auto">
@@ -25,9 +29,19 @@ const Header = () => {
           <Link to={"/about"}>
             <li className=" hover:underline pointer">About</li>
           </Link>
-          <Link to={"sign-in"}>
-            <li className=" hover:underline pointer">Sign In</li>
-          </Link>
+          {currentUser ? (
+            <Link to={"/profile"}>
+              <img
+                src={currentUser.profilePicture}
+                alt="profile-image"
+                className="rounded-full h-7 w-7 object-cover"
+              />
+            </Link>
+          ) : (
+            <Link to={"sign-in"}>
+              <li className=" hover:underline pointer">Sign In</li>
+            </Link>
+          )}
         </ul>
       </div>
     </header>
