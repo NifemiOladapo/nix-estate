@@ -1,13 +1,35 @@
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 const Profile = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => (state as any).user);
+  const inputRef = useRef(null);
+  const [file, setFile] = useState(undefined);
+
+  useEffect(() => {
+    if (file) {
+      handleFileUpload(file);
+    }
+  }, [file]);
+
+  const handleFileUpload = (file) => {
+    // firebase storage func
+  };
+
   return (
     <main className="mx-auto p-3 max-w-lg">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
       <form className="flex flex-col gap-4">
+        <input
+          type="file"
+          ref={inputRef}
+          onChange={(e) => setFile(e.target.files[0])}
+          hidden
+          accept="image/*"
+        />
         <img
-          src={currentUser?.profilePicture}
+          onClick={() => (inputRef.current as any).click()}
+          src={currentUser.profilePicture}
           alt="profiile"
           className="cursor-pointer rounded-full h-24 w-24 self-center object-cover mt-2"
         />

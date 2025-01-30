@@ -31,7 +31,6 @@ const SignIn = () => {
       const data = await res.json();
 
       if (data.success === false) return dispatch(signInFailure(data.message));
-      console.log(data);
       dispatch(signInSuccess(data));
       navigate("/");
     } catch (error) {
