@@ -1,10 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
+} from "../redux/user/userSlice.js";
 
 const Profile = () => {
-  const { currentUser } = useSelector((state) => (state as any).user);
+  const { currentUser, loading, error } = useSelector(
+    (state) => (state as any).user
+  );
   const inputRef = useRef(null);
   const [file, setFile] = useState(undefined);
+  const [formData, setFormData] = useState({});
+  const [updateSucessfull, setUpdateSucessfull] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (file) {
@@ -16,10 +27,37 @@ const Profile = () => {
     // firebase storage func
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prevData) => ({ ...prevData, [e.target.id]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+        return;
+      }
+
+      dispatch(updateUserSuccess(data));
+       setUpdateSucessfull(true);
+    } catch (error) {
+      dispatch(updateUserFailure((error as Error).message));
+    }
+  };
   return (
     <main className="mx-auto p-3 max-w-lg">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="file"
           ref={inputRef}
@@ -34,31 +72,40 @@ const Profile = () => {
           className="cursor-pointer rounded-full h-24 w-24 self-center object-cover mt-2"
         />
         <input
+          onChange={handleChange}
+          defaultValue={currentUser.username}
           id="username"
           type="text"
           placeholder="username"
           className="border p-3 rounded-lg"
         />
         <input
+          onChange={handleChange}
+          defaultValue={currentUser.email}
           id="email"
           type="email"
           placeholder="email"
           className="border p-3 rounded-lg"
         />
         <input
+          onChange={handleChange}
           id="password"
           type="password"
           placeholder="password"
           className="border p-3 rounded-lg"
         />
         <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
-          update
+          {loading ? "Updating..." : "Update"}
         </button>
       </form>
       <div className="flex justify-between mt-5">
         <span className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>
       </div>
+      <p className="text-red-700 mt-5">{error ? error : ""}</p>
+      {updateSucessfull && (
+        <p className="text-green-700 mt-5">User Updated Sucessfully</p>
+      )}
     </main>
   );
 };
