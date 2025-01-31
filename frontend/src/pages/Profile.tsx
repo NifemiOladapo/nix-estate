@@ -4,6 +4,9 @@ import {
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
 } from "../redux/user/userSlice.js";
 
 const Profile = () => {
@@ -31,6 +34,23 @@ const Profile = () => {
     setFormData((prevData) => ({ ...prevData, [e.target.id]: e.target.value }));
   };
 
+  const handleDeleteUser = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      deleteUserSuccess();
+    } catch (error) {
+      dispatch(deleteUserFailure((error as Error).message));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -49,11 +69,12 @@ const Profile = () => {
       }
 
       dispatch(updateUserSuccess(data));
-       setUpdateSucessfull(true);
+      setUpdateSucessfull(true);
     } catch (error) {
       dispatch(updateUserFailure((error as Error).message));
     }
   };
+
   return (
     <main className="mx-auto p-3 max-w-lg">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -99,7 +120,12 @@ const Profile = () => {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
+        <span
+          onClick={handleDeleteUser}
+          className="text-red-700 cursor-pointer"
+        >
+          Delete Account
+        </span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>
       </div>
       <p className="text-red-700 mt-5">{error ? error : ""}</p>
