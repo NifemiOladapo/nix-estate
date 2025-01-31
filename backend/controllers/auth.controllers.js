@@ -29,7 +29,7 @@ export const signin = async (req, res, next) => {
     const { password: pass, ...rest } = validUser._doc;
     const token = jwt.sign({ id: validUser._id }, process.env.JWT__SECRET);
     res
-      .cookie("access_token", token, { httpOnly: true },)
+      .cookie("access_token", token, { httpOnly: true })
       .status(200)
       .json(rest);
   } catch (error) {
@@ -68,6 +68,15 @@ export const google = async (req, res, next) => {
         .status(200)
         .json(rest);
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signOut = async (req, res, next) => {
+  try {
+    res.clearCookie("access_token");
+    res.status(200).json({ message: "user signed out" });
   } catch (error) {
     next(error);
   }
