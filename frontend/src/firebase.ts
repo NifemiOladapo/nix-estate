@@ -13,9 +13,9 @@ const firebaseConfig = {
   storageBucket: "instagram-clone-227e0.appspot.com",
   messagingSenderId: "229424080595",
   appId: "1:229424080595:web:d5cb19f5456daaadcb9626",
-  measurementId: "G-1360NKYDZM",
+  measurementId: "G-1360NKYDZM"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
